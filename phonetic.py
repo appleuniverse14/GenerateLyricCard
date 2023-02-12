@@ -10,9 +10,13 @@ def wordToPhoneticSymbol(word):
     req = requests.get(
         "https://dictionary.cambridge.org/us/dictionary/english/" + word, headers=headers)
     req_soup = BeautifulSoup(req.content, "html.parser")
-    pron = req_soup.find(
-        'span', attrs={'class': ['ipa', 'dipa', 'lpr-2', 'lpl-1']}).text
-    return pron
+    try:
+        pron = req_soup.find(
+            'span', attrs={'class': ['ipa', 'dipa', 'lpr-2', 'lpl-1']}).text
+        return pron
+    except AttributeError:
+        print('Failed to get phonetic symbol')
+        return ''
 
 
 def parseText(filename):  # Parse the text file(separete to words and '\n')
@@ -34,16 +38,13 @@ def generatePhoneticDict(filename):  # Generate dict of word and phonetic symbol
     words = parseText(filename)
     word_phonetic = []
     for word in words:
+        print(word)
         if word == '\n':
-            word_phonetic.append({'\n': '\n'})
+            word_phonetic.append(('\n', '\n'))
+        elif word == '':
+            pass
         else:
             phonetic = wordToPhoneticSymbol(word)
-            word_phonetic.append({word: phonetic})
+            word_phonetic.append((word, phonetic))
             time.sleep(0.1)
     return word_phonetic
-
-
-# test
-if __name__ == '__main__':
-    wordToPhoneticSymbol("something")
-    print(generatePhoneticDict('test.txt'))
