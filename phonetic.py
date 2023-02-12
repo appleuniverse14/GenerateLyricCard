@@ -1,14 +1,49 @@
 import requests
 from bs4 import BeautifulSoup
+import time
 
 
-def textToPhoneticSymbol(text):
-    req = requests.get("https://eow.alc.co.jp/search?q=" + text)
+# Get phonetic symbol of the word given as an argument
+def wordToPhoneticSymbol(word):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"}
+    req = requests.get(
+        "https://dictionary.cambridge.org/us/dictionary/english/" + word, headers=headers)
     req_soup = BeautifulSoup(req.content, "html.parser")
-    pron = req_soup.find('span', class_='pron').text[:-1]
-    print(pron)
+    pron = req_soup.find(
+        'span', attrs={'class': ['ipa', 'dipa', 'lpr-2', 'lpl-1']}).text
+    return pron
+
+
+def parseText(filename):  # Parse the text file(separete to words and '\n')
+    words = []
+    f = open('data/' + filename, 'r')
+    texts = f.readlines()
+    for text in texts:
+        for word in text.split(' '):
+            if word[-1] == '\n':
+                words.append(word[:-1])
+                words.append('\n')
+            else:
+                words.append(word)
+    f.close()
+    return words
+
+
+def generatePhoneticDict(filename):  # Generate dict of word and phonetic symbol
+    words = parseText(filename)
+    word_phonetic = []
+    for word in words:
+        if word == '\n':
+            word_phonetic.append({'\n': '\n'})
+        else:
+            phonetic = wordToPhoneticSymbol(word)
+            word_phonetic.append({word: phonetic})
+            time.sleep(0.1)
+    return word_phonetic
 
 
 # test
 if __name__ == '__main__':
-    textToPhoneticSymbol("something")
+    wordToPhoneticSymbol("something")
+    print(generatePhoneticDict('test.txt'))
