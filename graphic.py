@@ -27,7 +27,8 @@ NUMBERFONT = ImageFont.truetype(
     '/mnt/c/Windows/Fonts/HelveticaNeue-Light-08.ttf', NUMBERSIZE)
 PAGECOUNT = 1
 WORDINDEX = 0
-backgroundfile = 'data/background.img'
+backgroundfile = 'data/background.png'
+title = 'Something'
 
 
 def generateImage(wordList):
@@ -38,7 +39,7 @@ def generateImage(wordList):
 
     # draw title
     if PAGECOUNT == 1:
-        draw.text((WIDTH/2, TITLEMARGIN/2), 'TITLE',
+        draw.text((WIDTH/2, TITLEMARGIN/2), title,
                   '#000000', font=TITLEFONT, anchor='mm')
 
     # draw page number
@@ -92,7 +93,6 @@ def generateImage(wordList):
         WORDINDEX += 1
     img.save('data/output' + str(PAGECOUNT) + '.png')
     PAGECOUNT += 1
-    print(PAGECOUNT)
 
 
 def generatePDF(wordList):

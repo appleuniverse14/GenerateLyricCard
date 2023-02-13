@@ -21,7 +21,7 @@ def wordToPhoneticSymbol(word):
 
 def parseText(filename):  # Parse the text file(separete to words and '\n')
     words = []
-    f = open('data/' + filename, 'r')
+    f = open(filename, 'r')
     texts = f.readlines()
     for text in texts:
         for word in text.split(' '):
