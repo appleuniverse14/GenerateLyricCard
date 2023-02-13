@@ -1,5 +1,7 @@
 import phonetic
 import graphic
 
-word_phonetic = phonetic.generatePhoneticDict("lyric.txt")
+lyricfile = "data/lyric.txt"
+
+word_phonetic = phonetic.generatePhoneticDict(lyricfile)
 graphic.generatePDF(word_phonetic)

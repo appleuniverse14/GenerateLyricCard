@@ -1,5 +1,3 @@
-import cv2
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import img2pdf
 
@@ -29,12 +27,13 @@ NUMBERFONT = ImageFont.truetype(
     '/mnt/c/Windows/Fonts/HelveticaNeue-Light-08.ttf', NUMBERSIZE)
 PAGECOUNT = 1
 WORDINDEX = 0
+backgroundfile = 'data/background.img'
 
 
 def generateImage(wordList):
     global WORDINDEX
     global PAGECOUNT
-    img = Image.open('img/background.png')
+    img = Image.open(backgroundfile)
     draw = ImageDraw.Draw(img)
 
     # draw title
@@ -91,7 +90,7 @@ def generateImage(wordList):
                       font=PHONETICFONT, anchor='lm')
             phoneticAnchor_X = wordAnchor_X
         WORDINDEX += 1
-    img.save('img/output' + str(PAGECOUNT) + '.png')
+    img.save('data/output' + str(PAGECOUNT) + '.png')
     PAGECOUNT += 1
     print(PAGECOUNT)
 
@@ -105,7 +104,7 @@ def generatePDF(wordList):
     PDFFileName = 'data/output.pdf'
     imageList = []
     for i in range(1, PAGECOUNT, 1):
-        imageName = 'img/output' + str(i) + '.png'
+        imageName = 'data/output' + str(i) + '.png'
         imageList.append(imageName)
     with open(PDFFileName, "wb") as f:
         f.write(img2pdf.convert(imageList))
