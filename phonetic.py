@@ -43,8 +43,20 @@ def generatePhoneticDict(filename):  # Generate dict of word and phonetic symbol
             word_phonetic.append(('\n', '\n'))
         elif word == '':
             pass
+        elif '-' in word:
+            words_hyphen = word.split('-')
+            for i, word_hyphen in enumerate(words_hyphen):
+                if i < len(words_hyphen) - 1:
+                    word_hyphen += '-'
+                phonetic = wordToPhoneticSymbol(word_hyphen)
+                word_phonetic.append((word_hyphen, phonetic))
+                time.sleep(0.5)
         else:
-            phonetic = wordToPhoneticSymbol(word)
-            word_phonetic.append((word, phonetic))
+            if "'s" in word:
+                phonetic = wordToPhoneticSymbol(word[0:word.find("'")])
+                word_phonetic.append((word, phonetic))
+            else:
+                phonetic = wordToPhoneticSymbol(word)
+                word_phonetic.append((word, phonetic))
             time.sleep(0.1)
     return word_phonetic

@@ -17,8 +17,6 @@ COLUMNMARGIN_BOTTOM = 50
 WORDMARGIN = 50
 PHONETICMARGIN = 50
 NEWLINEMARGIN = 100
-TITLEFONT = ImageFont.truetype(
-    '/mnt/c/Windows/Fonts/HelveticaNeue-Light-08.ttf', TITLESIZE)
 WORDFONT = ImageFont.truetype(
     '/mnt/c/Windows/Fonts/HelveticaNeue-Light-08.ttf', WORDSIZE)
 PHONETICFONT = ImageFont.truetype(
@@ -38,7 +36,19 @@ def generateImage(wordList):
     draw = ImageDraw.Draw(img)
 
     # draw title
+    TITLEFONT = ImageFont.truetype(
+        '/mnt/c/Windows/Fonts/HelveticaNeue-Medium-11.ttf', TITLESIZE)
     if PAGECOUNT == 1:
+        titleSizeRatio = 1
+        while True:
+            wordBbox = draw.textbbox((WIDTH/2, TITLEMARGIN/2), title,
+                                     font=TITLEFONT, anchor='mm')
+            if wordBbox[0] < SIDEMARGIN or wordBbox[2] > WIDTH - SIDEMARGIN:
+                titleSizeRatio = 0.75
+                TITLEFONT = ImageFont.truetype(
+                    '/mnt/c/Windows/Fonts/HelveticaNeue-Medium-11.ttf', (int)(TITLESIZE*titleSizeRatio))
+            else:
+                break
         draw.text((WIDTH/2, TITLEMARGIN/2), title,
                   '#000000', font=TITLEFONT, anchor='mm')
 
@@ -68,6 +78,28 @@ def generateImage(wordList):
                     PHONETICMARGIN + COLUMNMARGIN_BOTTOM + COLUMNMARGIN_TOP
             phoneticAnchor_X = wordAnchor_X
             phoneticAnchor_Y = wordAnchor_Y + COLUMNMARGIN_MIDDLE + PHONETICMARGIN/2
+        elif wordList[WORDINDEX][0][-1] == '-':
+            wordBbox = draw.textbbox((wordAnchor_X, wordAnchor_Y), wordList[WORDINDEX][0],
+                                     font=WORDFONT, anchor='lm')
+            if wordBbox[1] > HEIGHT - BOTTOMMARGIN:  # stick out to the bottom
+                break
+            if wordBbox[2] > WIDTH - SIDEMARGIN:  # stick out to the right
+                wordAnchor_X = SIDEMARGIN
+                wordAnchor_Y += WORDMARGIN + COLUMNMARGIN_MIDDLE + \
+                    PHONETICMARGIN + COLUMNMARGIN_BOTTOM + COLUMNMARGIN_TOP
+                wordBbox = draw.textbbox((wordAnchor_X, wordAnchor_Y), wordList[WORDINDEX][0],
+                                         font=WORDFONT, anchor='lm')
+                phoneticAnchor_X = wordAnchor_X
+                phoneticAnchor_Y = wordAnchor_Y + COLUMNMARGIN_MIDDLE + PHONETICMARGIN/2
+            draw.text((wordAnchor_X, wordAnchor_Y), wordList[WORDINDEX][0], '#000000',
+                      font=WORDFONT, anchor='lm')
+            wordAnchor_X = wordBbox[2]
+            # draw phonetic symbol
+            phoneticBbox = draw.textbbox((phoneticAnchor_X, phoneticAnchor_Y), wordList[WORDINDEX][1] + '    ',
+                                         font=PHONETICFONT, anchor='lm')
+            draw.text((phoneticAnchor_X, phoneticAnchor_Y), wordList[WORDINDEX][1], '#888888',
+                      font=PHONETICFONT, anchor='lm')
+            phoneticAnchor_X = wordAnchor_X
         else:
             wordBbox = draw.textbbox((wordAnchor_X, wordAnchor_Y), wordList[WORDINDEX][0] + '    ',
                                      font=WORDFONT, anchor='lm')
@@ -91,7 +123,7 @@ def generateImage(wordList):
                       font=PHONETICFONT, anchor='lm')
             phoneticAnchor_X = wordAnchor_X
         WORDINDEX += 1
-    img.save('data/output' + str(PAGECOUNT) + '.png')
+    img.save('data/' + title + str(PAGECOUNT) + '.png')
     PAGECOUNT += 1
 
 
@@ -101,10 +133,10 @@ def generatePDF(wordList):
             break
         generateImage(wordList)
 
-    PDFFileName = 'data/output.pdf'
+    PDFFileName = 'data/' + title + '.pdf'
     imageList = []
     for i in range(1, PAGECOUNT, 1):
-        imageName = 'data/output' + str(i) + '.png'
+        imageName = 'data/' + title + str(i) + '.png'
         imageList.append(imageName)
     with open(PDFFileName, "wb") as f:
         f.write(img2pdf.convert(imageList))
